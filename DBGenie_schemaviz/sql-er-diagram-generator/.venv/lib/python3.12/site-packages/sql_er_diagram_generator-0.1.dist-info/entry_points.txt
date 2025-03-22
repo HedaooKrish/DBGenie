@@ -1,0 +1,2 @@
+[console_scripts]
+sql-er-diagram-generator = src.main:main

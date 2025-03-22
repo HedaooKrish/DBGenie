@@ -1,0 +1,15 @@
+// ER Diagram
+digraph {
+	Assignments [label=Assignments]
+	Courses [label=Courses]
+	Departments [label=Departments]
+	Enrollments [label=Enrollments]
+	ExtracurricularActivities [label=ExtracurricularActivities]
+	Students [label=Students]
+	Teachers [label=Teachers]
+	Courses -> Teachers [label=teacher_id]
+	Enrollments -> Students [label=student_id]
+	Enrollments -> Courses [label=course_id]
+	Students -> Departments [label=department_id]
+	Teachers -> Departments [label=department_id]
+}

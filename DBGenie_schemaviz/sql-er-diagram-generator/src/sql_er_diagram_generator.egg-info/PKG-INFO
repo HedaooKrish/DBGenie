@@ -1,0 +1,7 @@
+Metadata-Version: 2.2
+Name: sql-er-diagram-generator
+Version: 0.1
+Requires-Dist: sqlparse
+Requires-Dist: graphviz
+Requires-Dist: pydot
+Dynamic: requires-dist
