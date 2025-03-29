@@ -84,15 +84,28 @@ class QueryParser:
         return relationships
 
     @staticmethod
-    def parse_query(query: str) -> List[Dict]:
-        """
-        Parse any SQL query to extract all possible relationships
-        """
+    def parse_query(query: str) -> list[dict]:
+        """Parse a query and extract relationships with attributes."""
         relationships = []
+    
+        # Check if the query contains "FROM" and "JOIN"
+        if "FROM" not in query.upper() or "JOIN" not in query.upper():
+            print(f"Skipping invalid query: {query}")
+            return relationships  # Return an empty list for invalid queries
+    
+        try:
+             # Parse the query to extract source and target entities
+             parts = query.upper().split("FROM")
+             source_part = parts[1].strip().split()[0]  # Extract the source table
+             join_part = query.upper().split("JOIN")[1].strip().split()[0]  # Extract the target table
         
-        # Parse different types of relationships
-        relationships.extend(QueryParser.parse_join_query(query))
-        relationships.extend(QueryParser.parse_subquery(query))
-        relationships.extend(QueryParser.parse_union_query(query))
-        
-        return relationships 
+             # Add the relationship
+             relationships.append({
+                'source': source_part.lower(),
+                'target': join_part.lower(),
+                'type': 'join'
+        })
+        except (IndexError, ValueError) as e:
+            print(f"Error parsing query: {query}. Error: {e}")
+    
+        return relationships
