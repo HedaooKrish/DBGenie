@@ -18,20 +18,18 @@ def get_database_metadata(connector: MySQLConnector, database_name: str) -> tupl
     
     # Process each table
     for table in tables:
-        # Get columns
         columns = connector.get_table_columns(table)
-        column_names = [col['name'] for col in columns]
+        # Ensure columns are represented as objects with a 'name' attribute
+        column_objects = [{'name': col['name']} for col in columns]
+        entities.append(Entity(name=table, columns=column_objects))
         
-        # Create entity
-        entities.append(Entity(name=table, columns=column_names))
-        
-        # Get foreign keys
         foreign_keys = connector.get_foreign_keys(table)
         for fk in foreign_keys:
+            cardinality = "1:N"  # Default cardinality
             relationships.append(Relationship(
                 source=table,
                 target=fk['referenced_table'],
-                label=fk['column']
+                label=f"{fk['column']} ({cardinality})"
             ))
     
     return entities, relationships
@@ -112,11 +110,20 @@ def main():
             app_relationships = get_application_relationships(queries)
             
             # Generate new ER diagram with both types of relationships
+            # After fetching application-level relationships
             if app_relationships:
-                print("\nGenerating updated ER diagram with application-level relationships...")
-                all_relationships = db_relationships + app_relationships
-                generate_er_diagram(entities, all_relationships)
-                print("Updated ER diagram generated successfully!")
+             print("\nGenerating updated ER diagram with application-level relationships...")
+    
+             # Ensure all entities involved in application-level relationships have attributes
+             # Ensure all entities involved in application-level relationships have attributes
+             app_entities = set(rel.source for rel in app_relationships) | set(rel.target for rel in app_relationships)
+             for app_entity in app_entities:
+                 if app_entity not in [entity.name for entity in entities]:
+                    # Add a placeholder entity with no attributes if it doesn't exist
+                    entities.append(Entity(name=app_entity, columns=[]))  # Empty list for columns
+             all_relationships = db_relationships + app_relationships
+             generate_er_diagram(entities, all_relationships)
+             print("Updated ER diagram generated successfully!")
             else:
                 print("No valid application-level relationships found.")
         
